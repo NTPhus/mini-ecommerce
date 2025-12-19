@@ -1,0 +1,43 @@
+✅ BƯỚC 1 — Thiết kế Database (quan trọng nhất)
+Xác định entity:
+📌 Chỉ cần vẽ ERD (giấy / draw.io)
+🧱 BƯỚC 2 — Setup project skeleton
+Sau khi DB rõ ràng:
+nest new ecommerce-api
+Cấu hình:
+env
+database connection
+eslint + prettier
+folder structure
+🧬 BƯỚC 3 — Migration + Entity
+Viết entity từ ERD
+Tạo migration
+Chạy migration
+📌 Không dùng synchronize: true trong project nghiêm túc
+🔐 BƯỚC 4 — Auth trước (JWT, KHÔNG OAuth vội)
+Làm theo thứ tự:
+User entity
+Register
+Login
+JWT guard
+Role guard
+👉 OAuth để sau cùng
+🛍 BƯỚC 5 — Business core (Product → Order)
+Product
+Category
+Order
+Transaction
+Status
+🧪 BƯỚC 6 — Test song song
+Unit test cho service
+Integration test cho order
+📌 Đừng đợi xong mới test
+🚀 BƯỚC 7 — Redis + cache
+Cache product list
+Invalidate khi update
+🐳 BƯỚC 8 — Docker & CI/CD
+Dockerfile
+docker-compose
+CI:
+test
+build

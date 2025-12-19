@@ -1,0 +1,160 @@
+🌟 Ý tưởng: Mini E-commerce Backend (API only)
+
+Backend cho một hệ thống bán hàng đơn giản nhưng đầy đủ kiến thức thực tế
+
+1️⃣ Các chức năng chính
+🔐 Auth & User
+
+Register / Login (email + password)
+
+Login bằng OAuth (Google)
+
+JWT + Refresh Token
+
+Role:
+
+USER
+
+ADMIN
+
+🛍 Product & Category
+
+CRUD Product
+
+Product thuộc nhiều Category (Many-to-Many)
+
+Search + pagination
+
+Index DB cho:
+
+product.name
+
+category_id
+
+price
+
+🛒 Order
+
+User tạo order
+
+Order gồm nhiều product
+
+Transaction (rollback nếu lỗi)
+
+Trạng thái:
+
+PENDING
+
+PAID
+
+CANCELLED
+
+💬 Review
+
+User chỉ review product đã mua
+
+1 user chỉ review 1 lần / product
+
+Average rating (query tối ưu)
+
+2️⃣ Kiến trúc (rất quan trọng)
+src/
+├── auth/
+├── users/
+├── products/
+├── categories/
+├── orders/
+├── reviews/
+├── common/
+│   ├── guards/
+│   ├── pipes/
+│   ├── interceptors/
+│   └── decorators/
+
+3️⃣ Công nghệ nên dùng
+Mục	Công nghệ
+Framework	NestJS
+DB	PostgreSQL
+ORM	TypeORM
+Auth	JWT + OAuth (Google)
+Cache	Redis
+Validation	Zod
+Testing	Jest
+Container	Docker
+CI	GitHub Actions
+4️⃣ Phần test (rất quan trọng)
+Unit Test
+
+Service logic
+
+Guard
+
+Pipe
+
+Integration Test
+
+POST /auth/login
+
+POST /orders
+
+Transaction rollback
+
+📌 Dùng DB test riêng (Docker)
+
+5️⃣ CI/CD pipeline (chuẩn công ty)
+push code
+  ↓
+lint
+  ↓
+unit test
+  ↓
+integration test
+  ↓
+build docker image
+
+6️⃣ Docker setup
+
+Dockerfile multi-stage (bạn đã biết 👍)
+
+docker-compose:
+
+API
+
+PostgreSQL
+
+Redis
+
+7️⃣ Các bài toán “đinh” để học sâu
+
+🔥 Index & performance
+🔥 N+1 query
+🔥 Transaction
+🔥 OAuth callback
+🔥 Refresh token rotation
+🔥 Redis cache invalidation
+🔥 Role-based guard
+🔥 Migration
+
+8️⃣ Level up (nâng cao)
+
+Rate limit API
+
+Soft delete
+
+Audit log
+
+Idempotency key (order)
+
+Background job (BullMQ)
+
+9️⃣ Cách làm để học hiệu quả
+
+Thiết kế DB trước
+
+Viết migration
+
+CRUD → Auth → Order
+
+Viết unit test song song
+
+Cuối cùng mới làm CI/Docker

@@ -1,0 +1,67 @@
+users
+    field	note
+    id	PK
+    email	unique, index
+    password	bcrypt
+    role	USER / ADMIN
+    status	ACTIVE / BLOCKED
+    created_at	
+
+refresh_tokens
+    field	note
+    id	PK
+    user_id	FK → users.id
+    token	unique
+    expires_at	
+    revoked	boolean
+
+products
+    field	note
+    id	PK
+    name	index
+    description	
+    price	index
+    stock	
+    status	ACTIVE / DRAFT
+    created_at	
+
+categories
+
+Hỗ trợ category cha – con (tree)
+    field	note
+    id	PK
+    name	unique
+    parent_id	self FK
+
+product_categories (junction table)
+    field	note
+    product_id	FK
+    category_id	FK
+
+📌 Composite index (product_id, category_id)
+
+orders
+    field	note
+    id	PK
+    user_id	FK
+    status	PENDING / PAID / CANCELLED
+    total_amount	
+    created_at	
+
+order_items
+    field	note
+    id	PK
+    order_id	FK
+    product_id	FK
+    quantity	
+    price_snapshot	giá tại thời điểm mua
+
+reviews
+    field	note
+    id	PK
+    user_id	FK
+    product_id	FK
+    rating	1–5
+    comment	
+    created_at	
+📌 Unique (user_id, product_id)
