@@ -1,13 +1,13 @@
 import { Product } from "src/modules/products/entities/product.entity";
-import { User } from "src/modules/users/entities/user.entity";
 import { Entity, Index, JoinColumn, ManyToOne, OneToMany } from "typeorm";
+import { Category } from "./category.entity";
 
 @Entity()
-@Index(["product_id", "user_id"])
+@Index(["product_id", "category_id"])
 export class ProductCategory{
     @ManyToOne(() => Product, (product) => product.productCategories)
     product: Product;
 
-    @ManyToOne(() => User, (user) => user.productCategories)
-    user: User;
+    @ManyToOne(() => Category, (category) => category.productCategories)
+    category: Category;
 }

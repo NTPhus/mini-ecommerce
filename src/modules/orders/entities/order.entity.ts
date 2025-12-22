@@ -30,5 +30,5 @@ export class Order{
     created_at: Date;
 
     @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
-    orderItems: OrderItem;
+    orderItems: OrderItem[];
 }

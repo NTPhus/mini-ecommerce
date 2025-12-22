@@ -1,5 +1,4 @@
 import { RefreshTokens } from "src/modules/auth/entities/refresh-token.entity";
-import { ProductCategory } from "src/modules/categories/entities/product-category";
 import { Order } from "src/modules/orders/entities/order.entity";
 import { Review } from "src/modules/reviews/entities/review.entity";
 import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
@@ -34,9 +33,6 @@ export class User{
 
     @OneToMany(() => RefreshTokens, (refreshToken) => refreshToken.user)
     refreshTokens: RefreshTokens[];
-
-    @OneToMany(() => ProductCategory, (productCategory) => productCategory.user)
-    productCategories: ProductCategory[];
 
     @OneToMany(() => Order, (order) => order.user)
     orders: Order[];

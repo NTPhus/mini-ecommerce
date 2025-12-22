@@ -1,0 +1,50 @@
+Migrations giúp cho việc quản lý lịch sử thay đổi cấu trúc bảng (schema) trong database
+Setup migrations:
+- bao gồm có : type (loại db), host, port, username, password, database, các entities, migartions
+
+export const AppDataSource = new DataSource({
+    type: "mysql",
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT),
+    username: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    entities:['dist/**/*.entity.ts'],
+    migrations: ['dist/database/migrations/*js'],
+    synchronize: false
+})
+
+setup scripts trong package.json
+{
+  "scripts": {
+    "build": "nest build",
+    "migration:generate": "npm run build && typeorm migration:generate src/database/migrations/init -d dist/database/data-source.js",
+    "migration:run": "typeorm migration:run -d dist/database/data-source.js",
+    "migration:revert": "typeorm migration:revert -d dist/database/data-source.js"
+  }
+}
+
+setup db docker
+docker-compose.yml
+  services:
+    db:
+      image: postgres:15
+      container_name: ecommerce-db
+      env_file:
+        - .env
+      ports:
+        - "5432:5432"
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      
+  volumes:
+    postgres_data:
+
+setup file env:
+  DB_HOST=127.0.0.1
+  DB_PORT=5432
+  DB_USER=postgres
+  DB_PASS=postgres
+  DB_NAME=ecommerce-db
+
+run docker compose: $ docker compose up -d
