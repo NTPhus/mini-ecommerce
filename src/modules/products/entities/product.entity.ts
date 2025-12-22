@@ -1,5 +1,5 @@
 import { Review } from './../../reviews/entities/review.entity';
-import { ProductCategory } from "src/modules/categories/entities/product-category";
+import { ProductCategory } from "src/modules/categories/entities/product-category.entity";
 import { OrderItem } from "src/modules/orders/entities/order-item.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
