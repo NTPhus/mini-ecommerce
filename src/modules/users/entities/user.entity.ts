@@ -1,7 +1,7 @@
 import { RefreshTokens } from "src/modules/auth/entities/refresh-token.entity";
 import { Order } from "src/modules/orders/entities/order.entity";
 import { Review } from "src/modules/reviews/entities/review.entity";
-import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum UserRole{
     ADMIN = 'admin',
@@ -23,12 +23,15 @@ export class User{
     email: string;
 
     @Column()
+    password: string;
+
+    @Column({default: UserStatus.ACTIVE})
     status: UserStatus;
 
-    @Column()
+    @Column({default: UserRole.USER})
     role: UserRole;
 
-    @Column()
+    @CreateDateColumn({ name: 'created_at' })
     created_at: Date
 
     @OneToMany(() => RefreshTokens, (refreshToken) => refreshToken.user)

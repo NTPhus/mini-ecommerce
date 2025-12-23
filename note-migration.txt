@@ -18,7 +18,7 @@ setup scripts trong package.json
 {
   "scripts": {
     "build": "nest build",
-    "migration:generate": "npm run build && typeorm migration:generate src/database/migrations/init -d dist/database/data-source.js",
+    "migration:generate": "pnpm run build && typeorm migration:generate -d dist/database/data-source.js",
     "migration:run": "typeorm migration:run -d dist/database/data-source.js",
     "migration:revert": "typeorm migration:revert -d dist/database/data-source.js"
   }
@@ -28,23 +28,38 @@ setup db docker
 docker-compose.yml
   services:
     db:
-      image: postgres:15
+      image: mysql:8.0
       container_name: ecommerce-db
+      restart: always                  
       env_file:
         - .env
       ports:
-        - "5432:5432"
+        - "3306:3306"
       volumes:
-        - postgres_data:/var/lib/postgresql/data
-      
+        - mysql-data:/var/lib/mysql
+
   volumes:
-    postgres_data:
+    mysql-data:
 
 setup file env:
-  DB_HOST=127.0.0.1
-  DB_PORT=5432
-  DB_USER=postgres
-  DB_PASS=postgres
-  DB_NAME=ecommerce-db
+  MYSQL_ROOT_PASSWORD=123456789
+  MYSQL_DATABASE=ecommerce
+  MYSQL_HOST=127.0.0.1
+  MYSQL_PORT=3306
+  MYSQL_USERNAME=root
+  MYSQL_PASSWORD=123456789
 
 run docker compose: $ docker compose up -d
+
+Khởi tại migrations:
+  pnpm run migration:generate src/database/migrations/InitTables
+
+run migrations:
+  pnpm run migration:run
+
+revert migrations:
+  pnpm run migration:revert
+
+sau khi thay đổi entities thì chạy lại migration
+  pnpm run build
+  pnpm run migration:generate src/database/migrations/"noi dung"

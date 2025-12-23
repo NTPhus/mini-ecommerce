@@ -1,6 +1,6 @@
 import { Product } from "src/modules/products/entities/product.entity";
 import { User } from "src/modules/users/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Review{
@@ -19,9 +19,6 @@ export class Review{
     @Column()
     comment: string;
 
-    @Column({
-        type: 'timestamp',
-        default: 'CURRENT_TIMESTAMP'
-    })
+    @CreateDateColumn({ name: 'created_at' })
     created_at: Date;
 }

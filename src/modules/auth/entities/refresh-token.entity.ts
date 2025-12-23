@@ -1,5 +1,5 @@
 import { User } from "src/modules/users/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { BeforeInsert, Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class RefreshTokens {
@@ -9,15 +9,19 @@ export class RefreshTokens {
     @Column()
     token: string;
 
-    @Column()
+    @Column({ default: false })
     revoked: boolean;
 
-    @Column({
-        type: 'timestamp',
-        default: '(CURRENT_TIMESTAMP + INTERVAL 7 DAY)'
-    })
-    exprired_at: Date;
+    @Column({ name: 'expired_at' })
+    expired_at: Date;
 
     @ManyToOne(() => User, (user) => user.refreshTokens)
     user: User;
+
+    @BeforeInsert()
+    setExpiration() {
+        const now = new Date();
+        now.setDate(now.getDate() + 7);
+        this.expired_at = now;
+    }
 }

@@ -1,7 +1,7 @@
 import { Review } from './../../reviews/entities/review.entity';
 import { ProductCategory } from "src/modules/categories/entities/product-category.entity";
 import { OrderItem } from "src/modules/orders/entities/order-item.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum ProductStatus{
     ACTIVE = 'active',
@@ -28,10 +28,7 @@ export class Product{
     @Column()
     status: ProductStatus;
 
-    @Column({
-        type: 'timestamp',
-        default: 'CURRENT_TIMESTAMP'
-    })
+    @CreateDateColumn({ name: 'created_at' })
     created_at: Date;
 
     @OneToMany(() => ProductCategory, (productCategory) => productCategory.product)
