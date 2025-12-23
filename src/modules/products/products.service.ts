@@ -1,20 +1,26 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
 import { Product } from "./entities/product.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 import { CreateNewProductDto } from "./dto/create_new_product.dto";
 import { UpdateProductDto } from "./dto/update_product_dto.dto";
-import { LessThanOrEqual, Repository } from "typeorm";
+import { EntityManager, In, LessThanOrEqual, Repository } from "typeorm";
+import { ProductCategory } from "../categories/entities/product-category.entity";
+import { Category } from '../categories/entities/category.entity';
 
 @Injectable()
 export class ProductService {
+    numItem = 10;
+    minStock = 5;
     constructor(
-        @InjectRepository(Product) private readonly productRepository: Repository<Product>
+        @InjectRepository(Product) private readonly productRepository: Repository<Product>,
+        @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
+        private readonly entityManager: EntityManager
     ) { }
 
     async getAllProduct(page: number) {
         return await this.productRepository.find({
-            take: 20,
-            skip: (page - 1) * 20,
+            take: this.numItem,
+            skip: (page - 1) * this.numItem,
         });
     }
 
@@ -24,26 +30,50 @@ export class ProductService {
 
     async getInventory(page: number) {
         return await this.productRepository.find({
-            take: 5,
-            skip: (page - 1) * 5
+            take: this.numItem,
+            skip: (page - 1) * this.numItem
         })
     }
 
     async getProductsLowStock(page: number) {
         return await this.productRepository.find({
             where: {
-                stock: LessThanOrEqual(5)
+                stock: LessThanOrEqual(this.minStock)
             },
             order: {
                 stock: 'ASC'
             },
-            take: 5,
-            skip: (page - 1) * 5,
+            take: this.numItem,
+            skip: (page - 1) * this.numItem,
         })
     }
 
     async addNewProduct(item: CreateNewProductDto) {
-        return await this.productRepository.save(item);
+        const product = this.entityManager.create(Product, {
+            name: item.name,
+            price: item.price,
+            stock: item.stock,
+            description: item.description,
+        })
+
+        await this.entityManager.save(product);
+
+        const categories = await this.categoryRepository.findBy({
+            id: In(item.categories_id)
+        })
+
+        if(categories.length != item.categories_id.length) throw new BadRequestException("Invalid category id");
+
+        const productCategories = categories.map(category => {
+            const pc = new ProductCategory();
+            pc.product = product;
+            pc.category = category;
+            return pc;
+        })
+        
+        await this.entityManager.save(ProductCategory, productCategories)
+
+        return product;
     }
 
     async addManyProduct(items: CreateNewProductDto[]) {
@@ -60,6 +90,25 @@ export class ProductService {
         return {
             sucess: "Update success"
         }
+    }
+
+    async updateProductCategory(id: number, categories_id: number[]){
+        const product = await this.productRepository.findOneBy({id: id});
+        if(!product) throw new BadRequestException("Invalid product id");
+
+        const categories = await this.categoryRepository.findBy({
+            id: In(categories_id)
+        })
+        if(categories.length != categories_id.length) throw new BadRequestException("Invalid category id")
+
+        const productCategory = categories.map(item => {
+            const pc = new ProductCategory();
+            pc.category = item;
+            pc.product = product;
+            return pc;
+        })
+
+        await this.entityManager.save(ProductCategory, productCategory)
     }
 
     async deleteProduct(id: number) {

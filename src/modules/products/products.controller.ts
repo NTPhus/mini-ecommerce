@@ -40,6 +40,11 @@ export class ProductController {
         return this.productService.addManyProduct(NewProductsDto);
     }
 
+    @Patch("update-category/:id")
+    updateProductCategory(@Param("id") id: number, @Body() category_id: number[]){
+        return this.productService.updateProductCategory(id, category_id);
+    }
+
     @Patch(":id")
     updateProduct(@Param('id') id: number, @Body() ProductDto: UpdateProductDto) {
         return this.productService.updateProduct(id, ProductDto);
