@@ -25,7 +25,7 @@ export class Product{
     @Column()
     stock: number;
 
-    @Column()
+    @Column({default: ProductStatus.ACTIVE})
     status: ProductStatus;
 
     @CreateDateColumn({ name: 'created_at' })

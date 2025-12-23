@@ -1,4 +1,4 @@
-import { Column, Entity, Index, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique } from "typeorm";
 import { ProductCategory } from "./product-category.entity";
 
 @Entity()
@@ -10,9 +10,12 @@ export class Category{
     @Column()
     name: string;
 
-    @OneToOne(() => Category)
+    @ManyToOne(() => Category, (category) => category.children)
     @JoinColumn({name: "parent_id"})
     parent: Category;
+
+    @OneToMany(() => Category, (category) => category.parent)
+    children: Category[];
 
     @OneToMany(() => ProductCategory, (productCategory) => productCategory.category)
     productCategories: ProductCategory[];

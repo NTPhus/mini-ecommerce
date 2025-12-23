@@ -1,5 +1,5 @@
 import { User } from "src/modules/users/entities/user.entity";
-import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 
 export enum OrderStatus{
@@ -15,9 +15,10 @@ export class Order{
     id: number;
 
     @ManyToOne(() => User, (user) => user.orders)
+    @Index()
     user: User;
 
-    @Column()
+    @Column({default: OrderStatus.PENDING})
     status: OrderStatus;
 
     @Column()

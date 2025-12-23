@@ -12,5 +12,9 @@ export class UserService {
   getHello(): string {
     return 'Hello World!';
   }
+
+  async getInfo(user: User){
+    return await this.userRepository.findOne({where : {id: user.id}, select: {id: true, email: true}})
+  }
   
 }

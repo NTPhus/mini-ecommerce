@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppDataSource } from './database/data-source';
 import { APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProductModule } from './modules/products/products.module';
+import { CategoryModule } from './modules/categories/category.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -12,7 +14,7 @@ import { AuthModule } from './modules/auth/auth.module';
     envFilePath: '.env',
   }),
   TypeOrmModule.forRoot(AppDataSource.options)
-    , UserModule, AuthModule],
+    , UserModule, AuthModule, ProductModule, CategoryModule],
 
   providers: [{
     provide: APP_PIPE,
