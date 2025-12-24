@@ -1,6 +1,6 @@
-import { RefreshTokens } from "src/modules/auth/entities/refresh-token.entity";
-import { Order } from "src/modules/orders/entities/order.entity";
-import { Review } from "src/modules/reviews/entities/review.entity";
+import { RefreshTokens } from "../../auth/entities/refresh-token.entity";
+import { Order } from "../../orders/entities/order.entity";
+import { Review } from "../../reviews/entities/review.entity";
 import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum UserRole{

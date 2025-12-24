@@ -1,5 +1,5 @@
-import { Product } from "src/modules/products/entities/product.entity";
-import { User } from "src/modules/users/entities/user.entity";
+import { Product } from "../../products/entities/product.entity";
+import { User } from "../../users/entities/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -14,7 +14,7 @@ export class Review{
     product: Product;
 
     @Column()
-    rating: string;
+    rating: number;
 
     @Column()
     comment: string;

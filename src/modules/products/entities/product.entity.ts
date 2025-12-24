@@ -1,6 +1,6 @@
 import { Review } from './../../reviews/entities/review.entity';
-import { ProductCategory } from "src/modules/categories/entities/product-category.entity";
-import { OrderItem } from "src/modules/orders/entities/order-item.entity";
+import { ProductCategory } from "../../categories/entities/product-category.entity";
+import { OrderItem } from "../../orders/entities/order-item.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum ProductStatus{

@@ -1,5 +1,5 @@
-import { Product } from "src/modules/products/entities/product.entity";
-import { Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Product } from "../../products/entities/product.entity";
+import { Entity, Index,  ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Category } from "./category.entity";
 
 @Entity()

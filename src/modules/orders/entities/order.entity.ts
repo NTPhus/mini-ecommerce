@@ -1,4 +1,4 @@
-import { User } from "src/modules/users/entities/user.entity";
+import { User } from "../../users/entities/user.entity";
 import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { OrderItem } from "./order-item.entity";
 
@@ -22,7 +22,7 @@ export class Order{
     status: OrderStatus;
 
     @Column()
-    total_amout: number;
+    total_amount: number;
 
     @CreateDateColumn({ name: 'created_at' })
     created_at: Date;
