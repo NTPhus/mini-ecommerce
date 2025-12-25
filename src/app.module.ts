@@ -11,6 +11,7 @@ import { OrderModule } from './modules/orders/order.module';
 import { ReviewModule } from './modules/reviews/review.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
+import { CacheModule } from './modules/redis/cache.module';
 
 @Module({
   imports: [ConfigModule.forRoot({
@@ -22,7 +23,7 @@ import { AppController } from './app.controller';
     entities: [],           
     synchronize: true,
   })
-    , UserModule, AuthModule, ProductModule, CategoryModule, OrderModule, ReviewModule],
+    , UserModule, AuthModule, ProductModule, CategoryModule, OrderModule, ReviewModule, CacheModule],
   providers: [{
     provide: APP_PIPE,
     useClass: ValidationPipe,

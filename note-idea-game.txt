@@ -1,0 +1,59 @@
+Character:
+- HP
+- MP
+- ATK
+- AP 
+- Armor
+- Magic Resistance
+- Spd
+- Shield
+- Level
+
+Effect
+- Bleeding: trừ hp mỗi phút
+- Posion: trừ hp và giảm giới hạn hp
+- Burn: increase dmg 
+- Cold: decrease spd + Armor + MR
+- Crit: 170% DMG
+
+Class:
+- Assasin
+- Mage
+- Warrior
+
+Skill:
+- Fireball: 
+- Shield
+
+Iventory
+- Heal
+- MP
+
+Weapen
+- Sword: balance
+- Axe: huge damamge but slow
+- Knife: small damage but fast
+
+Equipment
+- Armor → áo giáp (phần thân)
+- Helmet / Helm → mũ
+- Chestplate / Chest Armor → giáp ngực
+- Leggings / Greaves → giáp chân
+- Boots → giày
+- Gloves / Gauntlets → găng tay
+- Robe → áo choàng (pháp sư)
+- Cloak / Cape → áo choàng ngoài
+
+Map
+a (M1 -> M2 -> M3 ->BossA)
+    ->b (M1 -> M2 -> M3 ->BossB)
+        ->c (M1 -> M2 -> M3 ->BossC)
+            ->d (M1 -> M2 -> M3 ->BossD)
+
+Monster
+- HP
+- MP
+
+Boss
+- HP
+- MP

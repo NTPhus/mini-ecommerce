@@ -1,14 +1,53 @@
-services:
-  db:
-    image: mysql:8.0
-    container_name: ecommerce-db
-    restart: always                  
-    env_file:
-      - .env
-    ports:
-      - "3306:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
+# services:
+#   db:
+#     image: mysql:8.0
+#     container_name: ecommerce-db
+#     restart: always                  
+#     env_file:
+#       - .env
+#     ports:
+#       - "3306:3306"
+#     volumes:
+#       - mysql-data:/var/lib/mysql
 
-volumes:
-  mysql-data:
+#   redis:
+#     image: redis:7
+#     ports:
+#       - '6379:6379'
+      
+# volumes:
+#   mysql-data:
+
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456789
+      MYSQL_DATABASE: ecommerce
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+

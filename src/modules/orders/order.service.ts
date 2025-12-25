@@ -7,6 +7,7 @@ import { User } from "../users/entities/user.entity";
 import { UpdateStatusDto } from "./dto/update-status.dto";
 import { OrderItem } from "./entities/order-item.entity";
 import { Product } from "../products/entities/product.entity";
+import { CacheService } from "../redis/cache.service";
 
 @Injectable()
 export class OrderService {
@@ -14,14 +15,19 @@ export class OrderService {
     constructor(
         @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
         @InjectRepository(OrderItem) private readonly orderItemReposity: Repository<OrderItem>,
-        private readonly entityManager: EntityManager
+        private readonly entityManager: EntityManager,
+        private readonly cacheService: CacheService
     ) { }
 
     async getAllOrder(page: number) {
-        return this.orderRepository.find({
+        const cached = this.cacheService.get(`orderList:${page}`);
+        if(cached) return cached;
+        const orderList = await this.orderRepository.find({
             take: this.numItem,
             skip: (page - 1) * this.numItem
         })
+        await this.cacheService.set(`orderList:${page}`, orderList, 120);
+        return orderList;
     }
 
     async getHistory(userId: number, page: number) {
@@ -104,5 +110,11 @@ export class OrderService {
 
     async updateStatus(dto: UpdateStatusDto[]) {
         this.orderRepository.save(dto);
+    }
+
+    async deleteOrder(orderId: number){
+        const orderItems = await this.getDetail(orderId);
+        await this.orderItemReposity.remove(orderItems);
+        return await this.orderRepository.delete(orderId);
     }
 }

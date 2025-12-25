@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from "@nestjs/common";
 import { OrderService } from "./order.service";
 import { AuthGuard } from "../../common/guards/auth.guard";
 import type { Request } from "express";
@@ -29,7 +29,7 @@ export class OrderController{
         return this.orderService.getDetail(orderId);
     }
 
-    @Post('update-status')
+    @Patch('update-status')
     updateStatus(@Body() dto: UpdateStatusDto[]){
         return this.orderService.updateStatus(dto);
     }
@@ -37,5 +37,10 @@ export class OrderController{
     @Post()
     createOrder(@CurrentUser() user: User, @Body() dto: OrderDto[]){
         return this.orderService.createOrder(user.id, dto);
+    }
+
+    @Delete(":id")
+    deleteOrder(@Param('id') orderId){
+        return this.orderService.deleteOrder(orderId);
     }
 }

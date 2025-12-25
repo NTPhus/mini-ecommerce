@@ -6,6 +6,7 @@ import { UpdateProductDto } from "./dto/update_product_dto.dto";
 import { EntityManager, In, LessThanOrEqual, Repository } from "typeorm";
 import { ProductCategory } from "../categories/entities/product-category.entity";
 import { Category } from '../categories/entities/category.entity';
+import { CacheService } from "../redis/cache.service";
 
 @Injectable()
 export class ProductService {
@@ -14,18 +15,32 @@ export class ProductService {
     constructor(
         @InjectRepository(Product) private readonly productRepository: Repository<Product>,
         @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
-        private readonly entityManager: EntityManager
+        private readonly entityManager: EntityManager,
+        private readonly cacheService: CacheService
     ) { }
 
     async getAllProduct(page: number) {
-        return await this.productRepository.find({
+        const cached = this.cacheService.get(`productList: ${page}`)
+        if(cached) return cached
+        const productList = await this.productRepository.find({
             take: this.numItem,
             skip: (page - 1) * this.numItem,
         });
+        if(productList.length > 0){
+            this.cacheService.set(`productList: ${page}`, productList, 120)
+        }
+        return productList;
     }
 
     async getInfoProduct(id: number) {
-        return await this.productRepository.findOneBy({ id: id });
+        const cached = this.cacheService.get(`productId:${id}`);
+        if(cached) return cached;
+
+        const product = await this.productRepository.findOneBy({ id: id });
+        if(product)
+            this.cacheService.set(`productId:${id}`, product, 120);
+
+        return product
     }
 
     async getInventory(page: number) {
@@ -86,7 +101,7 @@ export class ProductService {
         if (!exist) throw new NotFoundException("Not found this product");
 
         await this.productRepository.update(id, item);
-
+        this.cacheService.del(`productId:${id}`)
         return {
             sucess: "Update success"
         }

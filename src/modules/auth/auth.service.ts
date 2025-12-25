@@ -51,8 +51,6 @@ export class AuthService {
   }
 
   async refreshAccessToken(refreshToken: string){
-    // const payload = await this.jwtService.verifyAsync(refreshToken);
-
     const tokenRecord = await this.refreshTokenRepository.findOne({
       where: {token: refreshToken},
       relations: ['user']

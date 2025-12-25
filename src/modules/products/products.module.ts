@@ -4,10 +4,11 @@ import { Product } from "./entities/product.entity";
 import { ProductController } from "./products.controller";
 import { ProductService } from "./products.service";
 import { Category } from "../categories/entities/category.entity";
+import { CacheService } from "../redis/cache.service";
 
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Product, Category])],
+    imports: [TypeOrmModule.forFeature([Product, Category, CacheService])],
     controllers: [ProductController],
     providers: [ProductService]
 })  

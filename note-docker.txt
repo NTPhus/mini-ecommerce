@@ -1,0 +1,83 @@
+dockerfile  
+    # ===== STEP 1: BUILD =====
+        FROM node:20-alpine AS builder
+
+        WORKDIR /app
+
+        COPY package.json pnpm-lock.yaml ./
+        RUN npm install -g pnpm && pnpm install
+
+        COPY . .
+        RUN pnpm build
+
+
+    # ===== STEP 2: RUNTIME =====
+        FROM node:20-alpine
+
+        WORKDIR /app
+
+        COPY --from=builder /app/dist ./dist
+        COPY --from=builder /app/node_modules ./node_modules
+
+        CMD ["node", "dist/main.js"]
+
+.dockerignore
+    node_modules
+    dist
+    coverage
+    .git
+    .gitignore
+    .env
+    Dockerfile
+    docker-compose.yml
+
+
+Run
+    docker build -t my-image .
+    docker run my-image
+
+
+docker run -d -p 3000:3000 my-image
+-d chạy ngầm
+
+
+Build docker-compose: Build nhiều service trên docker
+
+services:
+  api:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file: .env
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456789
+      MYSQL_DATABASE: ecommerce
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+run
+    docker compose up -d
+
+    docker compose restart api
