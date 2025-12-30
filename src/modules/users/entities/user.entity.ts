@@ -1,7 +1,7 @@
 import { RefreshTokens } from "../../auth/entities/refresh-token.entity";
 import { Order } from "../../orders/entities/order.entity";
 import { Review } from "../../reviews/entities/review.entity";
-import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 export enum UserRole{
     ADMIN = 'admin',
@@ -15,6 +15,7 @@ export enum UserStatus{
 
 @Entity()
 @Index(['email'])
+@Unique(['provider', 'providerId'])
 export class User{
     @PrimaryGeneratedColumn()
     id: number;
@@ -22,7 +23,7 @@ export class User{
     @Column()
     email: string;
 
-    @Column()
+    @Column({ nullable: true })
     password: string;
 
     @Column({default: UserStatus.ACTIVE})
@@ -42,4 +43,10 @@ export class User{
 
     @OneToMany(() => Review, (review) => review.user)
     reviews: Review[];
+
+    @Column({ default: 'local' })
+    provider: string;
+
+    @Column({ name: 'provider_id', nullable: true })
+    providerId: string;
 }

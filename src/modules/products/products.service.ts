@@ -20,7 +20,7 @@ export class ProductService {
     ) { }
 
     async getAllProduct(page: number) {
-        const cached = this.cacheService.get(`productList: ${page}`)
+        const cached = await this.cacheService.get(`productList: ${page}`)
         if(cached) return cached
         const productList = await this.productRepository.find({
             take: this.numItem,
@@ -33,7 +33,7 @@ export class ProductService {
     }
 
     async getInfoProduct(id: number) {
-        const cached = this.cacheService.get(`productId:${id}`);
+        const cached = await this.cacheService.get(`productId:${id}`);
         if(cached) return cached;
 
         const product = await this.productRepository.findOneBy({ id: id });
@@ -101,7 +101,7 @@ export class ProductService {
         if (!exist) throw new NotFoundException("Not found this product");
 
         await this.productRepository.update(id, item);
-        this.cacheService.del(`productId:${id}`)
+        await this.cacheService.del(`productId:${id}`)
         return {
             sucess: "Update success"
         }

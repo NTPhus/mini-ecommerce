@@ -1,0 +1,21 @@
+WebSocket là công nghệ hỗ trợ giao tiếp hai chiều giữa client và server bằng cách sử dụng một TCP socket để tạo một kết nối hiệu quả và ít tốn kém.
+WebSocket
+- Mở kết nối lâu dài, thiết lập handshake giữa client và server.
+- Kết nối 2 chiều, Client và Server có thể gửi message bất cứ lúc nào
+
+Ưu điểm:
+- Websocket cung cấp khả năng giao tiếp hai chiều mạnh mẽ, độ trễ thấp và dễ xử lý lỗi.
+- API cũng rất dễ sử dụng trực tiếp mà không cần bất kỳ các tầng bổ sung nào.
+Nhược điểm:
+- Nó vẫn chưa được tất cả trình duyệt hỗ trợ.
+- Không có phạm vi yêu cầu nào.
+
+Những use case điển hình sử dụng WebSocket:
+- Chat, Notification realtime, game online, live dashboard,...
+
+Event-based communication là kiểu kiến trúc nà các thành phần không gọi trực tiếp nhau, mà emit sự kiện, và thành phần khác subcribe rồi phản ứng.
+Event-based communication là cách các thành phần trong hệ thống giap tiếp gián tiếp như:
+- Một bên phát Event
+- Nhiều bên khác lắng nghe, (subcribe) và tự giải quyết phản ứng:
+- Không có gọi trực tiếp
+

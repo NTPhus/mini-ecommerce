@@ -1,0 +1,54 @@
+Unit Testing (Kiểm thử đơn vị) 
+là mức độ kiểm thử nhỏ nhất trong quy trình phát triển phần mềm. 
+Ở đây, chúng ta tập trung vào việc kiểm tra các đơn vị mã nguồn cô lập (thường là một hàm, một phương thức hoặc một Class) để đảm bảo chúng hoạt động đúng như mong đợi.
+
+Đặc điểm của Unit test:
+    Tính cô lập (Isolation): Nó chỉ kiểm tra logic của chính hàm đó. Nếu hàm đó gọi tới Database, Redis hoặc API bên thứ ba, chúng ta phải dùng Mock (giả lập) các thành phần đó.
+    Tốc độ cực nhanh: Vì không phải kết nối mạng hay đọc đĩa, hàng ngàn Unit Test có thể chạy xong chỉ trong vài giây.
+    Tự động hóa: Thường được chạy mỗi khi bạn lưu code hoặc trước khi đẩy code lên server (CI/CD).
+
+Quy trình viết Unit Test (Mô hình AAA)
+    Arrange (Chuẩn bị): Khởi tạo các đối tượng, dữ liệu mẫu và thiết lập các Mock cần thiết.
+    Act (Hành động): Gọi hàm hoặc phương thức mà bạn muốn kiểm tra.
+    Assert (Xác nhận): Kiểm tra xem kết quả trả về có đúng với mong đợi hay không.
+
+Tại sao cần Unit Testing?
+    Tìm lỗi sớm: Sửa lỗi lúc đang viết code rẻ hơn rất nhiều so với sửa lỗi khi code đã lên Production.
+    Tự tin Refactor: Khi bạn muốn sửa lại code cho gọn hơn, Unit Test sẽ đảm bảo bạn không vô tình làm hỏng các tính năng cũ.
+    Tài liệu sống: Nhìn vào Unit Test, người khác sẽ hiểu ngay hàm này nhận vào cái gì và trả ra cái gì trong các trường hợp khác nhau.
+
+Integration Test (Kiểm thử tích hợp)
+ là mức độ kiểm thử tiếp theo sau Unit Test. 
+ Thay vì kiểm tra từng hàm riêng lẻ một cách cô lập, 
+ Integration Test tập trung vào việc kiểm tra sự tương tác và luồng dữ liệu giữa các module/thành phần khác nhau trong hệ thống.
+
+Tại sao phải làm Integration Test?
+    Sai cấu trúc dữ liệu: Service gửi dữ liệu kiểu string nhưng Database lại đợi kiểu number.
+    Lỗi kết nối: Không kết nối được với Redis hoặc MySQL do sai cấu hình.
+    Logic luồng: Guard chặn không cho vào Controller dù Token hợp lệ.
+
+Đặc điểm chính của Integration Test
+    Tính kết nối (Interconnectivity): Tập trung vào các điểm giao tiếp (interface) giữa các module. Ví dụ: Dữ liệu từ Controller đi vào Service có đúng kiểu không? Service gọi xuống Repository có lấy đúng dữ liệu từ MySQL không?
+    Môi trường "Gần thật" (Real-world Environment): Khác với Unit Test dùng Mock hoàn toàn, Integration Test thường sử dụng các thành phần thật như Database thật, Redis thật, File System thật.
+    Phát hiện lỗi "Side-effect": Giúp phát hiện các lỗi xảy ra do tác động phụ. Ví dụ: Hàm lưu User chạy đúng, nhưng nó vô tình làm trigger một hàm khác gây lỗi tràn bộ nhớ hoặc lỗi ràng buộc dữ liệu (Foreign Key).
+    Độ phủ rộng hơn (Broader Scope): Một bài Integration Test có thể đi xuyên qua nhiều lớp (Layer) của ứng dụng: Route -> Guard -> Controller -> Service -> Repository -> Database.
+
+E2E (End-to-End) Testing 
+là mức độ kiểm thử cao nhất và toàn diện nhất trong quy trình phát triển phần mềm.
+ Nếu Unit Test kiểm tra từng "viên gạch", Integration Test kiểm tra "bức tường", thì E2E Test là kiểm tra toàn bộ ngôi nhà xem nó có thể ở được hay không.
+
+Mục tiêu của E2E là mô phỏng hành vi của người dùng thực tế trên một hệ thống hoàn chỉnh, đi từ điểm bắt đầu đến điểm kết thúc của một quy trình nghiệp vụ.
+
+Đặc điểm cốt lõi của E2E Testing
+    Góc nhìn của người dùng: E2E không quan tâm code bên trong viết bằng gì (NestJS hay Java), nó chỉ quan tâm: "Tôi nhấn nút này, hệ thống phải hiện ra cái kia".
+    Môi trường thật 100%: Nó yêu cầu tất cả các thành phần phải hoạt động cùng lúc: Frontend, Backend, Database, Redis, và cả các dịch vụ bên thứ ba (Email, SMS, Payment Gateway).
+    Kiểm tra luồng dữ liệu (Data Flow): Đảm bảo dữ liệu đi xuyên suốt qua các lớp mà không bị sai lệch.
+
+Ưu điểm:
+    Độ tin cậy tuyệt đối: Nếu E2E pass, bạn có thể tự tin 99% rằng người dùng sẽ không gặp lỗi.
+    Phát hiện lỗi hệ thống: Tìm ra các lỗi "vô hình" như cấu hình sai firewall, sai tên miền API, hoặc lỗi phân quyền giữa các service.
+
+Nhược điểm:
+    Chậm: Vì phải load cả trình duyệt và chờ database, mạng... nên chạy rất mất thời gian.
+    Dễ "gãy" (Brittle): Chỉ cần bạn đổi tên một cái id trên giao diện HTML, bài test E2E có thể thất bại dù logic backend vẫn đúng.
+    Chi phí bảo trì cao: Mỗi khi thay đổi giao diện, bạn phải cập nhật lại bài test.

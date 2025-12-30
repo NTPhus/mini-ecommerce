@@ -1,0 +1,57 @@
+Client-side Caching (hay Caching phía trình duyệt)
+    là kỹ thuật lưu trữ các tài nguyên (như hình ảnh, file CSS, JavaScript, hoặc thậm chí là dữ liệu API) ngay trên thiết bị của người dùng (máy tính, điện thoại).
+
+    Thay vì lần nào cũng phải "chạy" lên Server để xin dữ liệu, trình duyệt sẽ kiểm tra xem trong "kho" của nó đã có sẵn bản sao chưa. 
+    Nếu có và vẫn còn hạn dùng, nó sẽ lấy ra xài luôn.
+
+Quy trình diễn ra theo các bước cơ bản:
+    Lần đầu truy cập: Trình duyệt gửi request lên Server. Server trả về tài nguyên kèm theo các chỉ dẫn trong HTTP Headers (như "Lưu file này trong 1 tiếng nhé").
+    Lưu trữ: Trình duyệt lưu file đó vào bộ nhớ (RAM hoặc Ổ cứng).
+    Lần truy cập sau: Trình duyệt tự hỏi: "Mình có file này chưa? Nó còn hạn không?".
+    Còn hạn: Lấy trực tiếp từ máy (tốc độ gần như bằng 0ms).
+    Hết hạn: Gửi một request nhẹ lên Server để hỏi "File này có gì mới không?" (Dùng ETag). Nếu không có gì mới, Server trả về mã 304 Not Modified (không gửi lại file), trình duyệt tiếp tục dùng bản cũ.
+
+Các loại lưu trữ ở Client-side
+    Ngoài bộ nhớ đệm tự động của trình duyệt (HTTP Cache), lập trình viên có thể chủ động lưu dữ liệu bằng:
+    Memory Cache: Lưu trên RAM (biến trong Javascript). Nhanh nhất nhưng mất khi F5 trang.
+    LocalStorage / SessionStorage: Lưu các chuỗi string nhỏ (như cài đặt giao diện Dark mode, Access Token).
+    IndexedDB: Một database thực thụ trong trình duyệt, dùng để lưu lượng dữ liệu lớn hoặc làm ứng dụng Offline.
+    Service Workers (Cache API): Dùng trong PWA (Progressive Web Apps), cho phép bạn kiểm soát cực kỳ chi tiết việc cache cái gì và khi nào.
+
+Lợi ích:
+    Tốc độ "vô đối": Không tốn thời gian chờ mạng.
+    Tiết kiệm tiền: Giảm băng thông cho cả người dùng (3G/4G) và chủ Server.
+    Trải nghiệm mượt mà: Người dùng nhấn Back/Forward là trang hiện ra tức thì.
+Rủi ro (Dữ liệu bị cũ - Stale Data):
+    Đây là vấn đề lớn nhất. Bạn vừa cập nhật giao diện mới nhưng khách hàng vẫn thấy giao diện cũ vì trình duyệt của họ vẫn đang dùng bản cache.
+    Cách giải quyết: Dùng kỹ thuật Cache Busting (thêm version vào file, ví dụ: style.css?v=2) hoặc cấu hình Header ETag chuẩn xác.
+
+Server-side caching với Redis là phương pháp sử dụng một hệ thống lưu trữ dữ liệu tạm thời (nằm hoàn toàn trên RAM) 
+để lưu lại kết quả của các tác vụ tốn kém (như truy vấn Database phức tạp hoặc gọi API bên thứ ba).
+
+Đây là mô hình phổ biến nhất khi kết hợp Redis với ứng dụng Backend:
+    Request tới: Server nhận yêu cầu (ví dụ: lấy chi tiết sản phẩm ID: 10).
+    Check Redis (Cache Hit?): Server kiểm tra trong Redis xem có key product:10 không.
+    Có (Hit): Lấy dữ liệu từ Redis trả về ngay (mất ~1ms).
+    Không (Miss): * Server vào MySQL truy vấn dữ liệu (mất ~50-200ms).
+    Lưu kết quả đó vào Redis kèm theo thời gian hết hạn (TTL - Time To Live).
+    Trả về: Gửi dữ liệu cho người dùng.
+
+ưu điểm vượt trội:
+    Chia sẻ dữ liệu (Shared Cache): Nếu bạn chạy 5 server (Load Balancing), In-memory cache sẽ bị phân tán ở mỗi máy. Redis là một server riêng biệt, nên cả 5 máy đều dùng chung một kho dữ liệu.
+    Không mất dữ liệu khi restart app: Khi bạn khởi động lại ứng dụng NestJS, các biến JS sẽ bị xóa sạch, nhưng dữ liệu trong Redis vẫn còn đó.
+    Tính năng TTL (Time To Live): Bạn có thể đặt "hạn sử dụng" cho từng key (ví dụ: thông tin user lưu 30 phút, danh sách sản phẩm lưu 5 phút). Redis sẽ tự xóa khi hết hạn.
+
+ưu tiên (vì không gì cũng lưu trong cache vì dung lượng hạn chế hơn db):
+    Dữ liệu đọc nhiều, ghi ít: Danh sách danh mục, cấu hình hệ thống, thông tin cá nhân.
+    Kết quả tính toán nặng: Thống kê doanh thu tháng, bảng xếp hạng.
+    Session/Token: Giống như cách bạn đang làm với OAuth, lưu Access Token vào Redis để kiểm tra cực nhanh ở mỗi request (thay vì vào DB tìm User).
+
+CDN (Content Delivery Network) 
+là mạng lưới máy chủ phân tán toàn cầu dùng để phân phối nội dung nhanh hơn, ổn định hơn cho người dùng.
+CDN dùng để phân phối nội dung gì:
+- Phân phối nội dung tĩnh: Ảnh, Video, HTML, CSS, JS, File, Font
+- Giảm tải cho server gốc: Ít request đến server hơn
+- Tăng độ ổn định: Load Balancing
+- Tăng bảo mật: DDoS protection
+

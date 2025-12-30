@@ -1,0 +1,62 @@
+Microservice architecture là system design của large application được built thành những collection nhỏ, loosely coupled, và service độc lập.
+Mỗi service, được biết là microservice, tập trung vào business function cụ thể và có thể dược phát triển, deployed và scale độc lập với các service khác. 
+- Service độc lập: mỗi microservice chia entity để giải quyết business function cụ thể, như là user authen, payment processing.
+- Quản lý data phi tập trung: mỗi microservice có thể có riêng database và hệ quản trị riêng, cho phép linh hoạt và scalability.
+- Communication: Microservice giao tiếp với nhưng cái khác thông qua API được xác định rõ ràng, thông thường sử dụng phương thức nhẹ như HTTP/REST hoặc là message queue
+- Autonomy: Teams có thể phát triển, deploy, và scale microservice độc lập, hướng đến chu kì phát triển nhanh và use dụng tài nguyên hiệu quả.
+- Resilience: Một microservice bị fail thì không ảnh hưởng lên toàn hệ thống.
+- Technology Diversity: microservice khác nhau có thể built bằng công nghệ khác nhau và ngôn ngữ lập trình khác nhau để phù hợp nhất với từng tasks cụ thể.
+
+Độ quan trọng của APIs trong Microservice
+- Communication: API cung cấp cho microservice để giao tiếp với nhưng cái khác. Chúng định nghĩa phương thức và data format cho việc thay đổi thông tin
+- Decoupling: bằng cách sử dụng API, microservices có thể duy trì loosely coupled. Thay đổi một service không ảnh hưởng trực tiếp đến nhưng service khác.
+- Scalability: APi cho phép microservices scale một cách độc lập. Services có thể deployed, cập nhật, và scale mà không ảnh hưởng đến phần khác của hệ thống, tăng cường scalability tổng thể và tối ưu tài nguyên.
+- Interoperability: API cho phép nhiều microservice khác nhau, có thể viết bằng nhiều ngôn ngữ khác nhau sử dụng nhiều công nghệ khác nhau, để hoạt động cùng nhau.
+- Reusability: API được thiết kế tốt có thể tái sử dụng ở nhiều service và ứng dụng khác nhau, giảm trùng lặp và gia tăng tính nhất quán trong business functions.
+- Evolvability: API cho phép tiến hóa dễ dàng hơn và tương tác của microservices. Khi features mới được thêm vào, và cái có sẵn có thể modified với sự gián đoạn tối thiểu trong hệ thống chung
+
+Event-Driven Architecture:
+Event-Driven Architecture (EDA) là design pattern có flow của hệ thống được quyết định bằng events như hành động user, sensor outputs, hoặc là messages từ hệ thống khác. EDA phụ thuộc vào events để trigger và giao tiếp sự thay đổi qua nhiều phần đa dạng trong hệ thống
+ - Cách tiếp cận này gia tăng loose coupling giữa các components, chúng không cân biết cài đặt chi tiết của nhưng cái khác nhưng cấu trúc và nghĩa của event và chúng tạo ra và tiêu thụ.
+ - Hệ thống Event-Driven thường sử dụng sự kiện trung gian hoặc là message buses để quản lý các events và đảm bảo vận chuyển đáng tin cậy đến các phần đang quan tâm.
+ - Kiến trúc này tăng cường scalability, flexibility, và responsiveness, làm nó phù hợp với ứng dụng real-time, workflows phức tạp, và hệ thống cần tích hợp đa dạng và các thành phần được phân phối hiệu quả.
+
+Event-Driven APIs là gì
+Event-Driven APIs là một loại interface designed để tạo điều kiện giao tiếp và tương tác giữa các components hoặc là các services trong EDA. 
+- Trong mô hình này, components có thể xuất bản nhiều events khi một số hành động hoặc là thay đổi trạng thái diễn ra, các components khác có thể subscribe tới các events để phản ứng phù hợp.
+- Style Giao tiếp bất đồng bộ này cho phép tách rời giữa các producers (components sinh ra sự kiện) và comsumers(components phản hồi lại các sự kiện), promoting scalabitity, flexibily, và resilience với app.
+- Event-Driven APIs thường phụ thuộc vào message trung gian và event buses để quản lý phân phối dự kiện và đảm đảm giao delivery đáng tin cậy đến các thành phần quan tâm.
+
+Key Components của Event-Driven APIs
+1.Events: Đây là core units của trao đổi thông tin trong EDA
+2.Event Producers: Components hoặc services chịu trách nhiệm cho generating và emitting event.
+3.Event Comsumers: Components hoặc services mà subcribe và xử lý events emitted by producers.
+4. Event Brokers hoặc là Message Brokers: Middleware components trung gian giữa producers và comsumers. Quản lý routing, delivery và persistence của event, đảm khỏa giao tiếp đáng tin cậy ngay cả khi producers và comsumers quản lý ở tốc độ và scales khác nhau.
+5. Event Schema và Contracts: Định nghĩa cấu trúc hoặc là schemas rằng chúng mô tả format và content của sự kiện trao đổi giữa các components.
+6. Subcriptions và Topics: Cơ chế thường dùng để quản lý quan hệ giữa các event producers và consumers. 
+7. Error Handling và Retry Machanisms: Chiến lược được thực hiện để xử lý lỗi và gián đoạn của event processing.
+
+Design Patterns cho Event-Driven APIs
+- Publish-Subcribe: 
+- Event Sourcing
+- CQRS (Command Query Responsibility Segregation)
+- Saga Pattern
+- Event-Driven Choreography
+- Event Collaboration
+- Event Versioning
+- Event Mesh
+- Event-Driven Microservices
+
+How to implement Event-Driven APIs
+Bước 1: Xác định Events and Event Sources
+Bước 2: Define Event Schemas
+Bước 3: Choose an Event Broker or Message Bus
+Bước 4: Cài đặt Event Producers
+Bước 5: Cài đặt Event Consumers
+Bước 6: Ensure Reliability and Consistency
+Bước 7: Monitor and Manage Event Flows
+Bước 8: Handle Event Versioning and Evolution
+Bước 9: Secure Event Communication
+Bước 10: Scale and Optimize Event-Driven Architecture
+Bước 11: Testing and Validation
+

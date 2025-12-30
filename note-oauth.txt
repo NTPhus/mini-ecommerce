@@ -1,0 +1,33 @@
+OAuth (Open Authorization) là một tiêu chuẩn công nghệ cho phép cấp quyền ứng dụng hoặc dịch vụ đăng nhập vòa một ứng dụng hoặc dịch vụ khác
+mà không tiết lộ thông tin riêng tư, như mật khẩu.  
+    - Một ứng dụng truy cập tài nguyên của người dùng
+    - KHÔNG cần biết mật khẩu của người dùng
+ -> OAuth không phải authentication (xác thực danh tính), mà là authorization (cấp quyền).
+
+Mục đích của OAuth là cấp quyền kết nối liền mạch với bạn bằng các ứng dụng và dịch vụ khác nhau mà khoong cần tạo tài khoản mới.
+OAuth được thiết kế để hoạt động với HTTP. Giao thức sử dụng access token để chứng minh danh tinh và cho phép danh tính đó tương tác với một dịch vụ khác thay mặt bạn.
+Trong trường hợp bị rò rĩ thì thông tin xác thực trên dịch vụ đầu tiên vẫn an toàn.
+
+Quy trình OAuth chủ yếu tương tác giữa máy với máy.
+
+Với OAuth
+    App chỉ nhận được:
+        access token
+    Token:
+        Có scope
+        Có thời hạn
+        Có thể revoke
+    
+Các thành phần trong OAuth
+Thành phần	            Vai trò
+Resource Owner	        Người dùng
+Client	                Ứng dụng bên thứ 3 (Web / Mobile / Backend)
+Authorization Server	Server cấp token (Google, Facebook, Auth0, Keycloak…)
+Resource Server	        API chứa dữ liệu
+Access Token	        Chìa khóa truy cập API
+
+OAuth 1.0	            OAuth 2.0
+Phức tạp	            Đơn giản hơn
+Dùng chữ ký	            Dùng HTTPS
+Ít dùng	                Chuẩn hiện nay
+
