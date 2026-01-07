@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
 import { UserService } from './users.service';
-import { User } from './entities/user.entity';
 import { AuthGuard } from '../../common/guards/auth.guard';
+import type { Request } from 'express';
 
 @Controller('user')
 @UseGuards(AuthGuard)
@@ -16,7 +16,7 @@ export class UserController {
   }
 
   @Get("info")
-  getInfo(@Body() user: User){
-    return this.userService.getInfo(user)
+  getInfo(@Req() req: Request){
+    return this.userService.getInfo(req.user.id)
   }
 }

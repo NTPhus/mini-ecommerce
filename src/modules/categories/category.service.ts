@@ -6,7 +6,6 @@ import { CategoryDTO } from './dto/category.dto';
 
 @Injectable()
 export class CategoryService {
-    private numItem = 10;
     constructor(
         @InjectRepository(Category) private readonly categoryRepository: Repository<Category>
     ) { }
@@ -52,10 +51,10 @@ export class CategoryService {
         return this.categoryRepository.findOneBy({id: id});
     }
 
-    async getAllCategory(page: number) {
+    async getAllCategory(page: number, numItem: number) {
         return this.categoryRepository.find({
-            take: this.numItem,
-            skip: (page - 1) * this.numItem
+            take: numItem,
+            skip: (page - 1) * numItem
         })
     }
 

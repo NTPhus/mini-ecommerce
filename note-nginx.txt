@@ -1,0 +1,49 @@
+Cài đặt Nginx
+    sudo apt update
+    sudo apt install nginx -y
+
+Thao tác	            Lệnh sử dụng
+Khởi động	            sudo service nginx start hoặc sudo systemctl start nginx
+Dừng	                sudo service nginx stop
+Khởi động lại	        sudo service nginx restart
+Kiểm tra trạng thái	    sudo service nginx status
+
+thư mục cần lưu ý
+    /etc/nginx/nginx.conf: Tệp cấu hình chính của Nginx.
+    /etc/nginx/sites-available/: Nơi chứa các tệp cấu hình cho từng trang web riêng biệt.
+    /etc/nginx/sites-enabled/: Nơi chứa các liên kết (symlink) đến các tệp trong sites-available. Nginx chỉ đọc các tệp ở đây.
+    /var/www/html/: Thư mục mặc định chứa mã nguồn website.
+
+Đưa mã nguồn vào /var/www/
+B1: Tạo thư mục dự án
+    sudo mkdir -p /var/www/"Ten du an"
+B2: Chép code vào thư mục này
+    sudo cp -r ~/folder-web/* /var/www/"Ten du an"
+    sudo cp -r /home/phu/static_web/securox/* /var/www/myapp/
+B3: Cấp quyền
+    # Đổi chủ sở hữu thư mục về cho user của Nginx
+    sudo chown -R www-data:www-data /var/www/"Ten du an"
+
+    # Cấp quyền đọc và thực thi cho thư mục
+    sudo chmod -R 755 /var/www/"Ten du an"
+
+tạo một Virtual Host
+B1: Tạo file cấu hình
+    sudo nano /etc/nginx/sites-available/"Ten du an"
+B2: Nội dung cấu hình
+server {
+    listen 80;
+    server_name "Ten mien"|"Dia chi IP";
+
+    root /var/www/"Ten du an";
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+B3: Kích hoạt cấu hình
+    sudo ln -s /etc/nginx/sites-available/"Ten du an" /etc/nginx/sites-enabled/
+B4: Kiểm tra và reload
+    sudo nginx -t             # Kiểm tra lỗi cú pháp
+    sudo service nginx reload # Áp dụng thay đổi

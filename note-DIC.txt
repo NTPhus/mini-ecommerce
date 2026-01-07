@@ -1,0 +1,6 @@
+DIC: Dependency Inject Container
+Module chỉ có công việc quản lý scope import module nào, export module nào
+DIC sẽ kiểm tra xem các service, Entity có nằm trong scope ở trong module. Nếu không có trong scope của module thì DIC sẽ trả về lỗi
+DIC bên trong hệ thống sẽ tự động kiểm tra các class và khởi tạo chúng.
+DIC tối ưu hơn new về khoản coupling, trong khi Service sử dụng new khi sử thì có thể phải sửa hàng chục file thì DIC chỉ cần chỉnh sử provider.
+DIC dễ scale hơn, đồng bộ khi làm việc nhóm, code sẽ đồng nhất hơn, dễ mock test

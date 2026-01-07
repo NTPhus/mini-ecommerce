@@ -1,18 +1,19 @@
-import { Body, Controller, Get, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { AuthenticationDTO } from '../users/dto/authentication.dto';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { OAuthLoginDto } from './dto/oauth-login.dto';
 import axios from 'axios';
 import { CacheService } from '../redis/cache.service';
+import { AuthCookies } from './interface/auth-cookies.interface';
 
 
 @Controller('auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly cacheService: CacheService
   ) { }
 
   @Post("register")
@@ -24,12 +25,15 @@ export class AuthController {
   @Post("login")
   async login(@Body() authenDTO: AuthenticationDTO, @Res() res: Response) {
     const result = await this.authService.login(authenDTO);
-    res.cookie("access-token", result.access_token, { httpOnly: true, maxAge: 30 * 60 * 1000 });
-    res.cookie("refresh-token", result.refresh_token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+    
+    res.cookie("accessToken", result.access_token, { httpOnly: true, maxAge: 30 * 60 * 1000 });
+    res.cookie("refreshToken", result.refresh_token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+
+    await this.cacheService.set(`userId:${result.user.id}`, result.access_token, 30 * 60 * 1000)
+
     if (result) {
       return res.status(200).json({
         message: "login success!",
-        data: result
       });
     }
 
@@ -38,11 +42,12 @@ export class AuthController {
 
   @Post("refresh")
   async refresh(@Req() req: Request, @Res() res: Response) {
-    const refreshToken = req.cookies['refresh-token'];
+    const {refreshToken} = req.cookies as AuthCookies;
+    
     if (!refreshToken) throw new UnauthorizedException();
 
-    const result = await this.authService.refreshAccessToken(refreshToken);
-    res.cookie("access-token", result.access_token, { httpOnly: true, maxAge: 30 * 60 * 1000 });
+    const result = await this.authService.refreshAccessToken(req.user.id, refreshToken);
+    res.cookie("accessToken", result.access_token, { httpOnly: true, maxAge: 30 * 60 * 1000 });
 
     if (result) {
       return res.status(200).json({
@@ -68,18 +73,20 @@ export class OAuthController {
 
   @Get('callback')
   @UseGuards(AuthGuard('oauth2'))
-  async callback(@CurrentUser() user: OAuthLoginDto, @Res() res: Response) {
-    const result = await this.authService.loginOAuth(user);
-    res.cookie("access-token", result.access_token, {
+  async callback(@Req() req: Request, @Res() res: Response) {
+    const dto = req.user as OAuthLoginDto;
+    const result = await this.authService.loginOAuth(dto);
+    res.cookie("accessToken", result.access_token, {
       httpOnly: true,
-      maxAge: 30 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 1000,
     });
 
-    res.cookie("refresh-token", result.refresh_token, {
+    res.cookie("refreshToken", result.refresh_token, {
       httpOnly: true,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    await this.cacheService.set(`userId:${result.user.id}`, result.access_token, 24 * 30 * 60 * 1000)
     return res.redirect("http://localhost:3000")
   }
 
@@ -130,7 +137,7 @@ export class OAuthController {
     const result = await this.authService.loginOAuth(user);
     res.cookie("access-token", result.access_token, {
       httpOnly: true,
-      maxAge: 30 * 60 * 1000,
+      maxAge: 30 * 24 * 60 * 1000,
     });
 
     res.cookie("refresh-token", result.refresh_token, {
@@ -138,6 +145,13 @@ export class OAuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
+    await this.cacheService.set(`userId:${result.user.id}`, result.access_token, 24 * 30 * 60 * 1000)
+
     return res.redirect("http://localhost:3000");
+  }
+
+  @Get('revoke/:id')
+  revokeToken(@Param('id') id: number){
+    return this.authService.revokeToken(id);
   }
 }

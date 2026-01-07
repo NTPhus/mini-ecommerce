@@ -8,7 +8,7 @@ import { Product } from "../products/entities/product.entity";
 
 @Injectable()
 export class ReviewService {
-    numItem = 10;
+    
     constructor(
         @InjectRepository(Review) private readonly reviewReposity: Repository<Review>,
         private readonly entityManager: EntityManager
@@ -30,12 +30,12 @@ export class ReviewService {
         return this.reviewReposity.save(review);
     }
 
-    async getReviews(productId: number, page: number) {
+    async getReviews(productId: number, page: number, numItem: number = 10) {
         return await this.reviewReposity.find({
             where: {
                 product: { id: productId }
-            }, take: this.numItem,
-            skip: (page - 1) * this.numItem
+            }, take: numItem,
+            skip: (page - 1) * numItem
         })
     }
 }

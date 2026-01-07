@@ -1,6 +1,6 @@
 import { UserService } from './../users/users.service';
 import { BadRequestException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -9,6 +9,7 @@ import { AuthenticationDTO } from '../users/dto/authentication.dto';
 import { RefreshTokens } from './entities/refresh-token.entity';
 import { OAuthLoginDto } from './dto/oauth-login.dto';
 import axios from 'axios';
+import { CacheService } from '../redis/cache.service';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +17,8 @@ export class AuthService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     @InjectRepository(RefreshTokens) private readonly refreshTokenRepository: Repository<RefreshTokens>,
     private readonly jwtService: JwtService,
-    private readonly userService: UserService
+    private readonly userService: UserService,
+    private readonly cacheService: CacheService
   ) { }
 
   async register(user: AuthenticationDTO) {
@@ -42,7 +44,7 @@ export class AuthService {
     ])
 
     const refreshToken = this.refreshTokenRepository.create({
-      token: bcrypt.hashSync(rt, Number(process.env.SALTS)),
+      token: rt, 
       user: Record,
     })
 
@@ -50,14 +52,19 @@ export class AuthService {
 
     return {
       access_token: at,
-      refresh_token: rt
+      refresh_token: rt,
+      user: Record
     }
   }
 
-  async refreshAccessToken(refreshToken: string) {
+  async refreshAccessToken(userId: number, refreshToken: string) {
+
     const tokenRecord = await this.refreshTokenRepository.findOne({
-      where: { token: refreshToken },
-      relations: ['user']
+      where: { token: refreshToken ,
+        user: {
+          id: userId
+        }
+      }
     })
 
     if (!tokenRecord) throw new UnauthorizedException("Token is not exist");
@@ -82,13 +89,19 @@ export class AuthService {
       },
     );
     console.log(response.data);
-    const {email, user_id} = response.data;
+    const { email, user_id } = response.data;
 
     return {
-      email : email,
+      email: email,
       provider: "mezon",
-      oauthId: user_id
+      providerId: user_id
     }
+  }
+
+  async revokeToken(userId: number) {
+    this.cacheService.del(`userId:${userId}`);
+    await this.refreshTokenRepository.update({ user: { id: userId }, revoked: false, expired_at: MoreThan(new Date()) }, { revoked: true })
+    return "Revoke success"
   }
 
   async loginOAuth(dto: OAuthLoginDto) {
@@ -98,14 +111,14 @@ export class AuthService {
 
     let user = await this.userService.findByOAuth(
       dto.provider,
-      dto.oauthId,
+      dto.providerId,
     );
 
     if (!user) {
       user = await this.userService.createOAuthUser({
         email: dto.email,
         provider: dto.provider,
-        providerId: dto.oauthId,
+        providerId: dto.providerId,
       });
     }
 
@@ -130,5 +143,5 @@ export class AuthService {
     };
   }
 
-  
+
 }

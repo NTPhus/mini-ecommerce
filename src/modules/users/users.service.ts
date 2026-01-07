@@ -13,8 +13,8 @@ export class UserService {
     return 'Hello World!';
   }
 
-  async getInfo(user: User) {
-    return await this.userRepository.findOne({ where: { id: user.id }, select: { id: true, email: true } })
+  async getInfo(userId: number) {
+    return await this.userRepository.findOne({ where: { id: userId }, select: { id: true, email: true } })
   }
 
   async findByOAuth(provider: string, providerId: string) {

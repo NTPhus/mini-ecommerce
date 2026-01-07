@@ -9,8 +9,8 @@ export class CategoryController{
     ){}
 
     @Get()
-    getAllCategory(@Query('page') page: number = 1){
-        return this.categoryService.getAllCategory(page);
+    getAllCategory(@Query('page') page: number = 1, @Query('numItem') numItem: number = 10){
+        return this.categoryService.getAllCategory(page, numItem);
     }
 
     @Post()

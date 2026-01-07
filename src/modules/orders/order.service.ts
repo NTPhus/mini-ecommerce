@@ -2,45 +2,39 @@ import { BadRequestException, Injectable, NotFoundException } from "@nestjs/comm
 import { InjectRepository } from "@nestjs/typeorm";
 import { Order } from "./entities/order.entity";
 import { EntityManager, In, Repository } from "typeorm";
-import { OrderDto } from "./dto/order.dto";
+import { OrderItemDto } from "./dto/order.dto";
 import { User } from "../users/entities/user.entity";
 import { UpdateStatusDto } from "./dto/update-status.dto";
 import { OrderItem } from "./entities/order-item.entity";
 import { Product } from "../products/entities/product.entity";
-import { CacheService } from "../redis/cache.service";
 
 @Injectable()
 export class OrderService {
-    numItem = 20;
     constructor(
         @InjectRepository(Order) private readonly orderRepository: Repository<Order>,
         @InjectRepository(OrderItem) private readonly orderItemReposity: Repository<OrderItem>,
-        private readonly entityManager: EntityManager,
-        private readonly cacheService: CacheService
+        private readonly entityManager: EntityManager
     ) { }
 
-    async getAllOrder(page: number) {
-        const cached = this.cacheService.get(`orderList:${page}`);
-        if(cached) return cached;
+    async getAllOrder(page: number, numItem: number) {
         const orderList = await this.orderRepository.find({
-            take: this.numItem,
-            skip: (page - 1) * this.numItem
+            take: numItem,
+            skip: (page - 1) * numItem
         })
-        await this.cacheService.set(`orderList:${page}`, orderList, 120);
         return orderList;
     }
 
-    async getHistory(userId: number, page: number) {
+    async getUserOrder(userId: number, page: number, numItem : number) {
         return await this.orderRepository.find({
             where: {
                 user: { id: userId }
             },
-            take: this.numItem,
-            skip: (page - 1) * this.numItem
+            take: numItem,
+            skip: (page - 1) * numItem
         })
     }
 
-    async getDetail(orderId: number) {
+    async getListOrderItems(orderId: number) {
         const result = await this.orderItemReposity.find({
             where: {
                 order: { id: orderId },
@@ -61,12 +55,12 @@ export class OrderService {
         return result;
     }
 
-    async createOrder(userId: number, dto: OrderDto[]) {
+    async createOrder(userId: number, OrderitemDto: OrderItemDto[]) {
         return await this.entityManager.transaction(async (em) => {
             const userExist = await this.entityManager.findOneBy(User, { id: userId });
             if (!userExist) throw new NotFoundException("Invalid user id");
 
-            const productIds = dto.map(item => item.productId);
+            const productIds = OrderitemDto.map(item => item.productId);
             const products = await this.entityManager.findBy(Product, {
                 id: In(productIds)
             })
@@ -81,7 +75,7 @@ export class OrderService {
             order.user = userExist;
             order.total_amount = 0;
 
-            for (const item of dto) {
+            for (const item of OrderitemDto) {
                 const product = productMap.get(item.productId);
                 if (!product) throw new NotFoundException(`Not found product id: ${item.productId}`)
                 
@@ -113,7 +107,7 @@ export class OrderService {
     }
 
     async deleteOrder(orderId: number){
-        const orderItems = await this.getDetail(orderId);
+        const orderItems = await this.getListOrderItems(orderId);
         await this.orderItemReposity.remove(orderItems);
         return await this.orderRepository.delete(orderId);
     }

@@ -10,7 +10,7 @@ import { CacheService } from "../redis/cache.service";
 
 @Injectable()
 export class ProductService {
-    numItem = 10;
+    ;
     minStock = 5;
     constructor(
         @InjectRepository(Product) private readonly productRepository: Repository<Product>,
@@ -19,12 +19,12 @@ export class ProductService {
         private readonly cacheService: CacheService
     ) { }
 
-    async getAllProduct(page: number) {
+    async getAllProduct(page: number, numItem:number) {
         const cached = await this.cacheService.get(`productList: ${page}`)
         if(cached) return cached
         const productList = await this.productRepository.find({
-            take: this.numItem,
-            skip: (page - 1) * this.numItem,
+            take: numItem,
+            skip: (page - 1) * numItem,
         });
         if(productList.length > 0){
             this.cacheService.set(`productList: ${page}`, productList, 120)
@@ -43,14 +43,14 @@ export class ProductService {
         return product
     }
 
-    async getInventory(page: number) {
+    async getInventory(page: number, numItem: number) {
         return await this.productRepository.find({
-            take: this.numItem,
-            skip: (page - 1) * this.numItem
+            take: numItem,
+            skip: (page - 1) * numItem
         })
     }
 
-    async getProductsLowStock(page: number) {
+    async getProductsLowStock(page: number, numItem: number) {
         return await this.productRepository.find({
             where: {
                 stock: LessThanOrEqual(this.minStock)
@@ -58,8 +58,8 @@ export class ProductService {
             order: {
                 stock: 'ASC'
             },
-            take: this.numItem,
-            skip: (page - 1) * this.numItem,
+            take: numItem,
+            skip: (page - 1) * numItem,
         })
     }
 

@@ -10,24 +10,24 @@ export class ProductController {
     ) { }
 
     @Get()
-    getAllProduct(@Query("page") page: number = 1){
+    getAllProduct(@Query("page") page: number = 1, @Query("numItem") numItem:number = 10){
         const pageNumber = Number(page) || 1;
         const safePage = pageNumber < 1 ? 1 : pageNumber;
-        return this.productService.getAllProduct(safePage)
+        return this.productService.getAllProduct(safePage, numItem)
     }
 
     @Get("inventory")
-    getInventory(@Query('page') page: number = 1) {
+    getInventory(@Query("page") page: number = 1, @Query("numItem") numItem:number = 10) {
         const pageNumber = Number(page) || 1;
         const safePage = pageNumber < 1 ? 1 : pageNumber;
-        return this.productService.getInventory(safePage);
+        return this.productService.getInventory(safePage, numItem);
     }
 
     @Get("low-stock")
-    getProductLowStock(@Query("page") page: number = 1) {
+    getProductLowStock(@Query("page") page: number = 1, @Query("numItem") numItem:number = 10) {
         const pageNumber = Number(page) || 1;
         const safePage = pageNumber < 1 ? 1 : pageNumber;
-        return this.productService.getProductsLowStock(safePage);
+        return this.productService.getProductsLowStock(safePage, numItem);
     }
 
     @Post("add")
